@@ -1,7 +1,7 @@
 # TODO: Bogenbeschreibeung?
 # brauche ich nil und ende?
 # 0 als alternative
-
+# warum condition so gekurzt
 
 from enum import Enum
 
@@ -82,13 +82,62 @@ graphBlock = [Bogen("CONST",None, 1, 6), #0
               Bogen("block", None, 16,0),#15
               Bogen(";", None, 12,0),   #16
               Bogen("0", None, 18, 0 ), #17
-              EndBogen("statement", None,0,0)
+              EndBogen("statement", None,0,0) #18
               ]
 
-graphExpression = []
-graphTerm = []
-graphStatement = []
-graphCondition = []
+graphExpression = [Bogen("-", None, 1,5),#0
+                   Bogen("term", None,2,0),#1
+                   Bogen("0", None,3,0),#2
+                   Bogen("+",None,4,5),#3
+                   Bogen("term",None,2,0),#4
+                   Bogen("-",None,6,8),#5
+                   Bogen("term",None,2,0),#6
+                   Bogen("term",None,2,0),#7
+                   EndBogen("0", None, 0,0),#8
+                   ]
+graphTerm = [   Bogen("factor",None,1,0), #0
+                Bogen("0", None, 2,0), #1
+                Bogen("*",None,3,4), #2
+                Bogen("factor",None,1,0), #3
+                Bogen("/",None,5,6), #4
+                Bogen("factor",None,1,0), #5
+                EndBogen("0", None, 0,0), #6
+             ]
+graphStatement = [  Bogen("ident",None,1,3), #0
+                    Bogen(":=",None,2,0), #1
+                    Bogen("expression",None,0,0), #2 ENDBOGEN?
+                    Bogen("IF",None,4,7), #3
+                    Bogen("CONDITION",None,5,0), #4
+                    Bogen("THEN",None,6,0), #5
+                    Bogen("STATEMENT",None,0,0), #6 ENDBOGEN?
+                    Bogen("WHILE",None,8,11), #7
+                    Bogen("CONDITION",None,9,0), #8
+                    Bogen("DO",None,10,0), #9
+                    Bogen("STATEMENT", None, 0,0), #10 ENDBOGEN?
+                    Bogen("BEGIN",None,12,15), #11
+                    Bogen("STATEMENT",None, 13,0), #12
+                    Bogen(";",None,12,14), #13
+                    Bogen("END",None, 0 ,0), #14 ENDBOGEN?
+                    Bogen("CALL",None,16,17), #15
+                    Bogen("IDENT",None,0,0), #16 ENDBOGEN?
+                    Bogen("?",None, 18,19), #17
+                    Bogen("ident",None, 0,0), #18 ENDBOGEN?
+                    Bogen("!", None, 20,21), #19
+                    Bogen("EXPRESSION",None,0,0), #20 ENDBOGEN?
+                    Bogen("0",None,0,0), #21 ENDBOGEN?
+                  ]
+graphCondition = [  Bogen("ODD",None,1,2), #0
+                    Bogen("EXPRESSION",None,0,0), #1
+                    Bogen("EXPRESSION",None,3,0), #2
+                    Bogen("=",None,9,4), #3
+                    Bogen("#",None,9,5), #4
+                    Bogen("<",None,9,6), #5
+                    Bogen(">",None,9,7), #6
+                    Bogen("<=",None,9,8), #7
+                    Bogen(">=",None,9,0), #8
+                    Bogen("EXPRESSION",None,0,0), #9
+
+]
 
 
 def main():
