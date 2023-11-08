@@ -234,15 +234,3 @@ class Lexer:
         arrayToString = "".join(array)
         print("arrayToString: " + arrayToString)
         return arrayToString if hash(arrayToString) in self.hashTable else ""
-
-class bogenTyp(Enum):
-    BgNil = 0
-    BgSymbol = 1
-    BgMorphem = 2
-    BgGraph = 4
-    BgEnde = 8
-
-
-class Bogen:
-    Typ: bogenTyp
-
