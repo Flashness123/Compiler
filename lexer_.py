@@ -26,6 +26,12 @@ class KeyWord(Enum):
         ZVAR = 141
         ZWHL = 142
 
+class MorphemTyp(Enum):
+    Ident = 0
+    Number = 1
+    Symbol = 2
+
+
 token_to_enum = {
     ":=":KeyWord.ZErg,
     "<":KeyWord.Zle,
@@ -44,20 +50,20 @@ token_to_enum = {
     "WHILE": KeyWord.ZWHL
 }
 class Morph:
-    MorphemCode = None
-    MorphemCode = ""
+    MorphemTyp = None
     PosLine = 0
     PosCol = 0
     Value = []
     mpLen = 0
     def __init__(self):
-        self.MorphemCode = ""
+        self.MorphemTyp = None
         self.PosLine = 0
         self.PosCol = 0
         self.Value = []
         self.mpLen = 0
-    def __init__(self, MorphemCode, PosLine, PosCol, Value, mpLen):
-        self.MorphemCode = MorphemCode
+
+    def __init__(self, MorphemTyp, PosLine, PosCol, Value, mpLen):
+        self.MorphemTyp = MorphemTyp
         self.PosLine = PosLine
         self.PosCol = PosCol
         self.Value = Value
@@ -186,33 +192,33 @@ class Lexer:
         print(self.token.Value)
         #in python kein switchcase, spater als dictionary map:
         if(self.currentState == 3 or self.currentState == 4 or self.currentState == 5 or self.currentState == 0):
-            self.token.MorphemCode = "mcSymb"
+            self.token.MorphemTyp = MorphemTyp.Symbol
             self.token.Value = ord(''.join(self.token.Value))
             #self.token.Value =  unverstandlich, steht doch schon drinnen
 
         elif self.currentState == 1:
-            self.token.MorphemCode = "mcNum"
+            self.token.MorphemTyp = MorphemTyp.Number
 
         elif self.currentState == 2: # ist nur der case fur namen und schlusselwort
             case = self.HashKey(self.token.Value)
             if case != "":
-                self.token.MorphemCode = "mcSymb"
+                self.token.MorphemTyp = MorphemTyp.Symbol
                 self.token.Value = token_to_enum[case].value
             else :
-                self.token.MorphemCode = "mcIdent"
+                self.token.MorphemTyp = MorphemTyp.Ident
                 self.token.Value = str(case)
 
 
         elif self.currentState == 6:
-            self.token.MorphemCode = "mcSymb"
+            self.token.MorphemTyp = MorphemTyp.Symbol
             self.token.Value = KeyWord.ZErg.value
 
         elif self.currentState == 7:
-            self.token.MorphemCode = "mcSymb"
+            self.token.MorphemTyp = MorphemTyp.Symbol
             self.token.Value = KeyWord.Zle.value
 
         elif self.currentState == 8:
-            self.token.MorphemCode = "mcSymb"
+            self.token.MorphemTyp = MorphemTyp.Symbol
             self.token.Value = KeyWord.Zle.value
         self.endState = 8 #soll das 1 oder 0 sein?
 
