@@ -4,8 +4,8 @@
 # warum condition so gekurzt
 
 from enum import Enum
-
 import lexer_
+from lexer_ import Morph
 
 
 class bogenTyp(Enum):  # Bei Beck tBg
@@ -70,7 +70,7 @@ graphBlock = [Bogen("CONST",None, 1, 6), #0
               Bogen("numeral", None, 4, 0),#3
               Bogen(",", None, 1, 5),    #4
               Bogen(";", None, 7, 0),    #5
-              Bogen("0", None, 7, 0),    #6        #ist das keine Prooblem? 0 steht fur ersten bogen UND fuer keinen bogen
+              Bogen("0", None, 7, 0),    #6        #ist das kein Prooblem? 0 steht fur ersten bogen UND fuer keinen bogen
               Bogen("VAR", None, 8,11), #7
               Bogen("ident",None,9,0),  #8
               Bogen(",",None,8,10),     #9
@@ -139,6 +139,17 @@ graphCondition = [  Bogen("ODD",None,1,2), #0
 
 ]
 
+def pars(bogen):
+    pBog = bogen
+    succ = 0
+    morphem = Morph
+    print(morphem)
+    if morphem.MorphemCode == "":
+        lexer_.lexer.lex()
+    while True:
+
+
+    return None
 
 def main():
     input_string = "while VAR := TSymbol; begin while true do begin"

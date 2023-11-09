@@ -44,6 +44,18 @@ token_to_enum = {
     "WHILE": KeyWord.ZWHL
 }
 class Morph:
+    MorphemCode = None
+    MorphemCode = ""
+    PosLine = 0
+    PosCol = 0
+    Value = []
+    mpLen = 0
+    def __init__(self):
+        self.MorphemCode = ""
+        self.PosLine = 0
+        self.PosCol = 0
+        self.Value = []
+        self.mpLen = 0
     def __init__(self, MorphemCode, PosLine, PosCol, Value, mpLen):
         self.MorphemCode = MorphemCode
         self.PosLine = PosLine
