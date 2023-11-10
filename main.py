@@ -19,6 +19,11 @@ class bogenTyp(Enum):  # Bei Beck tBg
 
 
 class SymbolBogen:  # bei Beck tBog
+    Typ = bogenTyp.BgSymbol
+    Bogenbeschreibung = None
+    Folgefunktion = None
+    Folgebogen = None
+    Alternativbogen = None
     def __init__(self, bogenbeschreibung, folgefunktion, folgebogen, alternativbogen):
         Typ = bogenTyp.BgSymbol  # (Ascii oder Wortsymbolcode aus enum)
         Bogenbeschreibung = bogenbeschreibung
@@ -28,6 +33,11 @@ class SymbolBogen:  # bei Beck tBog
 
 
 class MorphemBogen:
+    Typ = bogenTyp.BgMorphem
+    Bogenbeschreibung = None
+    Folgefunktion = None
+    Folgebogen = None
+    Alternativbogen = None
     def __init__(self, bogenbeschreibung, folgefunktion, folgebogen, alternativbogen):
         Typ = bogenTyp.BgMorphem  # Morphem
         Bogenbeschreibung = bogenbeschreibung
@@ -37,6 +47,11 @@ class MorphemBogen:
 
 
 class GraphBogen:
+    Typ = bogenTyp.BgGraph
+    Bogenbeschreibung = None
+    Folgefunktion = None
+    Folgebogen = None
+    Alternativbogen = None
     def __init__(self, bogenbeschreibung, folgefunktion, folgebogen, alternativbogen):
         Typ = bogenTyp.BgGraph  # Graph
         Bogenbeschreibung = bogenbeschreibung
@@ -46,10 +61,13 @@ class GraphBogen:
 
 
 class EndBogen:
+    Typ = bogenTyp.BgEnde
     def __init__(self):
         Typ = bogenTyp.BgEnde  # Morphem
 
 class NilBogen:
+    Typ = bogenTyp.BgNil
+    Folgefunktion = None
     def __init__(self, folgebogen):
         Typ = bogenTyp.BgNil
         Folgefunktion = folgebogen
@@ -67,6 +85,7 @@ class Parse():
     graphFactor = None
     graphStatement = None
     graphCondition = None
+    graphProgramm = None
     def __init__(self):
 
 
@@ -162,29 +181,37 @@ class Parse():
 
         ]
 
-    def pars(bogen):
+    def pars(bogen): #ich uebergebe einen Bogen
         pBog = bogen
         succ = 0
         morphem = Morph
         print(morphem)
-        if morphem.MorphemCode == "":
-            lexer_.lexer.lex()
+        if morphem.MorphemTyp == None:
+            lexer.lex()
+            print("Nachstes token gelext")
         while True:
+            print ("Schleife geentert")
+            if pBog.Typ == bogenTyp.BgNil:
+                print("Nilbogen")
+                succ = 1
+            if pBog.Typ == bogenTyp.BgSymbol:
+                print("Symbolbogen")
+            if pBog.Typ == bogenTyp.BgMorphem:
+                print("Morphembogen")
+            if pBog.Typ == bogenTyp.BgGraph:
+                print("Graphbogen")
+            if pBog.Typ == bogenTyp.BgEnde:
+                print("Endbogen")
             return None
-
         return None
 
-def main():
-    input_string = "while VAR := TSymbol; begin while true do begin"
+input_string = "while VAR := TSymbol; begin while true do begin"
 
-    lexer = lexer_.Lexer(input_string)
+lexer = lexer_.Lexer(input_string)
+def main():
     print(lexer.Test())
-    tokens = []
-    types = []
     lex = lexer.lex()
-    tokens.append(lex.Value)
-    print("Tokens: ")
-    print(tokens)
+    Parse.pars(GraphBogen)
     """lex = lexer.lex()
     tokens.append(lex.Value)
     print("Tokens: ")
