@@ -188,8 +188,8 @@ class Lexer:
         self._fl()
 
     def _fb(self): #funktion beenden
-        #print("Jetzt muss ich das token zuruckgeben")
-        #print(self.token.Value)
+        print("Jetzt muss ich das token zuruckgeben")
+        print(self.token.Value)
         #in python kein switchcase, spater als dictionary map:
         if(self.currentState == 3 or self.currentState == 4 or self.currentState == 5 or self.currentState == 0):
             self.token.MorphemTyp = MorphemTyp.Symbol
@@ -201,12 +201,13 @@ class Lexer:
 
         elif self.currentState == 2: # ist nur der case fur namen und schlusselwort
             case = self.HashKey(self.token.Value)
-            if case != "":
+            if case != 'NO':
                 self.token.MorphemTyp = MorphemTyp.Symbol
                 self.token.Value = token_to_enum[case].value
             else :
                 self.token.MorphemTyp = MorphemTyp.Ident
-                self.token.Value = str(case)
+                print("Case: " + str(self.token.Value))
+                self.token.Value = str(self.token.Value)
 
 
         elif self.currentState == 6:
@@ -249,6 +250,32 @@ class Lexer:
         [(endState, _fb),   (endState, _fb),(endState, _fb),(endState, _fb),    (endState, _fb),    (endState, _fb),    (endState, _fb),    (endState, _fb)]]
 
     def HashKey(self, array: list):
-        arrayToString = "".join(array)
+        arrayToString = ''.join(array)
         #print("arrayToString: " + arrayToString)
-        return arrayToString if hash(arrayToString) in self.hashTable else ""
+        return arrayToString if hash(arrayToString) in self.hashTable else "NO"
+
+input_string = "VAR x, y; BEGIN x := 2; y := x + 3; END."
+def main():
+    print(hash('X'))
+    lexer = Lexer(input_string)
+    print(lexer.Test())
+    morphem = lexer.lex()
+    print(morphem.Value)
+    morphem = lexer.lex()
+    print(morphem.Value)
+    morphem = lexer.lex()
+    print(morphem.Value)
+    morphem = lexer.lex()
+    print(morphem.Value)
+    morphem = lexer.lex()
+    print(morphem.Value)
+    morphem = lexer.lex()
+    print(morphem.Value)
+    morphem = lexer.lex()
+    print(morphem.Value)
+    return -1
+
+
+# Testen des Interpreters
+if __name__ == '__main__':
+    main()
