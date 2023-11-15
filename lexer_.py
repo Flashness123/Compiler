@@ -159,15 +159,15 @@ class Lexer:
         self.token.Value = []
         self.endState = 8 # wichtig, auch endState wieder auf 9 setzen
         while(self.currentState != self.endState):
-            print("the expression is: " + self.Expression)
+            #print("the expression is: " + self.Expression)
             if not self.Expression:
                 break
             tupel = self.Automatentabelle[self.currentState][self.Zeichenklassenvektor[ord(self.Expression[0])].value]  # currenstate fibt Zeile an,  # Vektor gibt Spalte an  # gibt tupel nachster zustand
             #^ 0 oder 1? 0 funktioniert besser
             exec = tupel[1](self)
-            print("Tupel 0: " + str(tupel[0]))
+            #print("Tupel 0: " + str(tupel[0]))
             self.currentState = tupel[0]
-            print(exec)
+            #print(exec)
 
         return self.token #if self.token.Value else None
 
@@ -178,7 +178,7 @@ class Lexer:
 
     def _fsl(self):# schreiben, lesen
         normal = self.Expression[0]
-        print("geschrieben und gelesen: " + normal)
+        #print("geschrieben und gelesen: " + normal)
         self.token.Value.append(normal)
         self._fl()
 
@@ -188,8 +188,8 @@ class Lexer:
         self._fl()
 
     def _fb(self): #funktion beenden
-        print("Jetzt muss ich das token zuruckgeben")
-        print(self.token.Value)
+        #print("Jetzt muss ich das token zuruckgeben")
+        #print(self.token.Value)
         #in python kein switchcase, spater als dictionary map:
         if(self.currentState == 3 or self.currentState == 4 or self.currentState == 5 or self.currentState == 0):
             self.token.MorphemTyp = MorphemTyp.Symbol
@@ -225,14 +225,14 @@ class Lexer:
 
 
     def _fl(self): #lesen
-        print("FL ausgefuhrt")
+        #print("FL ausgefuhrt")
         char = self.Expression[0]
         if char == '\n':
             self.Line += 1
             self.Col = 0
         else:
             self.Col += 1
-        print("Expression wurde ein zeichen abgezogen")
+        #print("Expression wurde ein zeichen abgezogen")
         self.Expression = self.Expression[1:] # spater testen
 
     Automatentabelle = [
@@ -250,5 +250,5 @@ class Lexer:
 
     def HashKey(self, array: list):
         arrayToString = "".join(array)
-        print("arrayToString: " + arrayToString)
+        #print("arrayToString: " + arrayToString)
         return arrayToString if hash(arrayToString) in self.hashTable else ""
