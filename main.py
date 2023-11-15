@@ -201,7 +201,7 @@ class Parse():
             if pBog.Typ == bogenTyp.BgGraph:
                 print("Graphbogen")
             if pBog.Typ == bogenTyp.BgEnde:
-                print("Endbogen")
+                print("Endbogen-")
             return None
         return None
 
