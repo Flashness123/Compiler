@@ -24,12 +24,14 @@ class SymbolBogen:  # bei Beck tBog
     Folgefunktion = None
     Folgebogen = None
     Alternativbogen = None
-    def __init__(self, bogenbeschreibung, folgefunktion, folgebogen, alternativbogen):
+    GraphPosition = None
+    def __init__(self, bogenbeschreibung, folgefunktion, folgebogen, alternativbogen, Graphposition):
         self.Typ = bogenTyp.BgSymbol  # (Ascii oder Wortsymbolcode aus enum)
         self.Bogenbeschreibung = bogenbeschreibung
         self.Folgefunktion = folgefunktion
         self.Folgebogen = folgebogen
         self.Alternativbogen = alternativbogen
+        self.GraphPosition = Graphposition
 
 
 class MorphemBogen:
@@ -38,12 +40,14 @@ class MorphemBogen:
     Folgefunktion = None
     Folgebogen = None
     Alternativbogen = None
-    def __init__(self, bogenbeschreibung, folgefunktion, folgebogen, alternativbogen):
+    GraphPosition = None
+    def __init__(self, bogenbeschreibung, folgefunktion, folgebogen, alternativbogen, Graphposition):
         self.Typ = bogenTyp.BgMorphem  # Morphem
         self.Bogenbeschreibung = bogenbeschreibung
         self.Folgefunktion = folgefunktion
         self.Folgebogen = folgebogen
         self.Alternativbogen = alternativbogen
+        self.GraphPosition = Graphposition
 
 
 class GraphBogen:
@@ -52,12 +56,14 @@ class GraphBogen:
     Folgefunktion = None
     Folgebogen = None
     Alternativbogen = None
-    def __init__(self, bogenbeschreibung, folgefunktion, folgebogen, alternativbogen):
+    GraphPosition = None
+    def __init__(self, bogenbeschreibung, folgefunktion, folgebogen, alternativbogen, Graphposition):
         self.Typ = bogenTyp.BgGraph  # Graph
         self.Bogenbeschreibung = bogenbeschreibung
         self.Folgefunktion = folgefunktion
         self.Folgebogen = folgebogen
         self.Alternativbogen = alternativbogen
+        self.GraphPosition = Graphposition
 
 
 class EndBogen:
@@ -67,213 +73,321 @@ class EndBogen:
 
 class NilBogen:
     Typ = bogenTyp.BgNil
+    Folgebogen = None
+    GraphPosition = None
     Folgefunktion = None
-    def __init__(self, folgebogen):
+
+    def __init__(self, folgebogen, Graphposition):
         self.Typ = bogenTyp.BgNil
-        self.Folgefunktion = folgebogen
+        self.Folgebogen = folgebogen
+        self.GraphPosition = Graphposition
+
+
     # def __init__(self, folgefunktion,folgebogen):
     #     Typ = bogenTyp.BgNil
     #     Folgefunktion = folgefunktion
-    #     Folgefunktion = folgebogen
+    #     Folgebogen = folgebogen
 
+class graphType(Enum):
+    graphBlock = 0
+    graphExpression = 1
+    graphTerm = 2
+    graphFactor = 3
+    graphStatement = 4
+    graphCondition = 5
+    graphProgramm = 6
 
 
 class Parse():
     graphBlock = [-1]
     graphExpression = [-1]
     graphTerm = [-1]
-    graphFactor = []
+    graphFactor = [-1]
     graphStatement = [-1]
     graphCondition = [-1]
     graphProgramm = [-1]
     def __init__(self):
 
 
-        self.graphFactor = [MorphemBogen(MorphemTyp.Ident, None, 5, 1), #0
-                       MorphemBogen(MorphemTyp.Number, None, 5, 2),  #1
-                       SymbolBogen("(", None, 3, -1),        #2
-                       GraphBogen(self.graphExpression[0], None, 4, -1),     #3
-                       SymbolBogen(")", None, 5, -1),        #4
+        self.graphFactor = [MorphemBogen(MorphemTyp.Ident, None, 5, 1, self.graphFactor), #0
+                       MorphemBogen(MorphemTyp.Number, None, 5, 2, self.graphFactor),  #1
+                       SymbolBogen("(", None, 3, -1, self.graphFactor),        #2
+                       GraphBogen(self.graphExpression[0], None, 4, -1, self.graphFactor),     #3
+                       SymbolBogen(")", None, 5, -1, self.graphFactor),        #4
                        EndBogen() #5
                        ]
 
                     #Typ    String  None Folge Alternative
-        self.graphBlock = [SymbolBogen("CONST",None, 1, 6), #0
-                      MorphemBogen(MorphemTyp.Ident, None, 2, -1),#1
-                      SymbolBogen("=", None, 3, -1),    #2
-                      MorphemBogen(MorphemTyp.Number, None, 4, -1),#3
-                      SymbolBogen(",", None, 1, 5),    #4
-                      SymbolBogen(";", None, 7, -1),    #5
-                      NilBogen(7),    #6        #ist das kein Prooblem? 0 steht fur ersten bogen UND fuer keinen bogen
-                      SymbolBogen("VAR", None, 8,11), #7
-                      MorphemBogen("ident",None,9,-1),  #8
-                      SymbolBogen(",",None,8,10),     #9
-                      SymbolBogen(";", None, 12, -1),  #10
-                      NilBogen(12),  #11
-                      SymbolBogen("PROCEDURE", None, 13, 17),#12
-                      MorphemBogen("ident", None, 14,-1),#13
-                      SymbolBogen(";", None,15,-1),    #14
-                      GraphBogen(self.graphBlock[0], None, 16,-1),#15
-                      SymbolBogen(";", None, 12,-1),   #16
+        self.graphBlock = [SymbolBogen("CONST",None, 1, 6, self.graphBlock), #0
+                      MorphemBogen(MorphemTyp.Ident, None, 2, -1, self.graphBlock),#1
+                      SymbolBogen("=", None, 3, -1, self.graphBlock),    #2
+                      MorphemBogen(MorphemTyp.Number, None, 4, -1, self.graphBlock),#3
+                      SymbolBogen(",", None, 1, 5, self.graphBlock),    #4
+                      SymbolBogen(";", None, 7, -1, self.graphBlock),    #5
+                      NilBogen(7, self.graphBlock),    #6        #ist das kein Prooblem? 0 steht fur ersten bogen UND fuer keinen bogen
+                      SymbolBogen("VAR", None, 8,11, self.graphBlock), #7
+                      MorphemBogen("ident",None,9,-1, self.graphBlock),  #8
+                      SymbolBogen(",",None,8,10, self.graphBlock),     #9
+                      SymbolBogen(";", None, 12, -1, self.graphBlock),  #10
+                      NilBogen(12, self.graphBlock),  #11
+                      SymbolBogen("PROCEDURE", None, 13, 17, self.graphBlock),#12
+                      MorphemBogen("ident", None, 14,-1, self.graphBlock),#13
+                      SymbolBogen(";", None,15,-1, self.graphBlock),    #14
+                      GraphBogen(self.graphBlock[0], None, 16,-1, self.graphBlock),#15
+                      SymbolBogen(";", None, 12,-1, self.graphBlock),   #16
                       #NilBogen(None,18), #17
-                      NilBogen(18),
-                      GraphBogen(self.graphStatement[0], None,19,-1), #18
+                      NilBogen(18, self.graphBlock),
+                      GraphBogen(self.graphStatement[0], None,19,-1, self.graphBlock), #18
                       EndBogen() #19
                       ]
 
 
-        self.graphExpression = [SymbolBogen("-", None, 1,7),#0
-                           GraphBogen(self.graphTerm[0], None,2,-1),#1
-                           NilBogen(3),#2
-                           SymbolBogen("+",None,4,5),#3
-                           GraphBogen(self.graphTerm[0],None,2,-1),#4
-                           SymbolBogen("-",None,6,8),#5 #ist das so richtig Endbogen nur als alternative
-                           GraphBogen(self.graphTerm[0],None,2,-1),#6
-                           GraphBogen(self.graphTerm[0],None,2,-1),#7
+        self.graphExpression = [SymbolBogen("-", None, 1,7, self.graphExpression),#0
+                           GraphBogen(self.graphTerm[0], None,2,-1, self.graphExpression),#1
+                           NilBogen(3, self.graphExpression),#2
+                           SymbolBogen("+",None,4,5, self.graphExpression),#3
+                           GraphBogen(self.graphTerm[0],None,2,-1, self.graphExpression),#4
+                           SymbolBogen("-",None,6,8, self.graphExpression),#5 #ist das so richtig Endbogen nur als alternative
+                           GraphBogen(self.graphTerm[0],None,2,-1, self.graphExpression),#6
+                           GraphBogen(self.graphTerm[0],None,2,-1, self.graphExpression),#7
                            EndBogen(),#8
                            ]
-        self.graphTerm = [   GraphBogen(self.graphFactor[0],None,1,-1), #0
-                        NilBogen(2), #1
-                        SymbolBogen("*",None,3,4), #2
-                        GraphBogen(self.graphFactor[0],None,1,-1), #3
-                        SymbolBogen("/",None,5,6), #4
-                        GraphBogen(self.graphFactor[0],None,1,-1), #5
+        self.graphTerm = [   GraphBogen(self.graphFactor[0],None,1,-1, self.graphTerm), #0
+                        NilBogen(2, self.graphTerm), #1
+                        SymbolBogen("*",None,3,4, self.graphTerm), #2
+                        GraphBogen(self.graphFactor[0],None,1,-1, self.graphTerm), #3
+                        SymbolBogen("/",None,5,6, self.graphTerm), #4
+                        GraphBogen(self.graphFactor[0],None,1,-1, self.graphTerm), #5
                         EndBogen(), #6
                      ]
-        self.graphStatement = [  MorphemBogen("ident",None,1,3), #0
-                            SymbolBogen(":=",None,2,-1), #1
-                            GraphBogen(self.graphExpression[0],None,22,-1), #2 ENDBOGEN?
-                            SymbolBogen("IF",None,4,7), #3
-                            GraphBogen(self.graphCondition[0],None,5,-1), #4
-                            SymbolBogen("THEN",None,6,-1), #5
-                            GraphBogen(self.graphStatement[0],None,22,-1), #6 ENDBOGEN?
-                            SymbolBogen("WHILE",None,8,11), #7
-                            GraphBogen(self.graphCondition[0],None,9,-1), #8
-                            SymbolBogen("DO",None,10,-1), #9
-                            GraphBogen(self.graphStatement[0], None, 22,-1), #10 ENDBOGEN?
-                            SymbolBogen("BEGIN",None,12,15), #11
-                            GraphBogen(self.graphStatement[0],None, 13,-1), #12
-                            SymbolBogen(";",None,12,14), #13
-                            SymbolBogen("END",None, 22,-1), #14 ENDBOGEN?
-                            SymbolBogen("CALL",None,16,17), #15
-                            MorphemBogen("ident",None,22,-1), #16 ENDBOGEN?
-                            SymbolBogen("?",None, 18,19), #17
-                            MorphemBogen("ident",None, 22,-1), #18 ENDBOGEN?
-                            SymbolBogen("!", None, 20,21), #19
-                            GraphBogen(self.graphExpression[0],None,22,-1), #20 ENDBOGEN?
-                            NilBogen(22), #21 ENDBOGEN?
+        self.graphStatement = [  MorphemBogen("ident",None,1,3, self.graphStatement), #0
+                            SymbolBogen(":=",None,2,-1, self.graphStatement), #1
+                            GraphBogen(self.graphExpression[0],None,22,-1, self.graphStatement), #2 ENDBOGEN?
+                            SymbolBogen("IF",None,4,7, self.graphStatement), #3
+                            GraphBogen(self.graphCondition[0],None,5,-1, self.graphStatement), #4
+                            SymbolBogen("THEN",None,6,-1, self.graphStatement), #5
+                            GraphBogen(self.graphStatement[0],None,22,-1, self.graphStatement), #6 ENDBOGEN?
+                            SymbolBogen("WHILE",None,8,11, self.graphStatement), #7
+                            GraphBogen(self.graphCondition[0],None,9,-1, self.graphStatement), #8
+                            SymbolBogen("DO",None,10,-1, self.graphStatement), #9
+                            GraphBogen(self.graphStatement[0], None, 22,-1, self.graphStatement), #10 ENDBOGEN?
+                            SymbolBogen("BEGIN",None,12,15, self.graphStatement), #11
+                            GraphBogen(self.graphStatement[0],None, 13,-1, self.graphStatement), #12
+                            SymbolBogen(";",None,12,14, self.graphStatement), #13
+                            SymbolBogen("END",None, 22,-1, self.graphStatement), #14 ENDBOGEN?
+                            SymbolBogen("CALL",None,16,17, self.graphStatement), #15
+                            MorphemBogen("ident",None,22,-1, self.graphStatement), #16 ENDBOGEN?
+                            SymbolBogen("?",None, 18,19, self.graphStatement), #17
+                            MorphemBogen("ident",None, 22,-1, self.graphStatement), #18 ENDBOGEN?
+                            SymbolBogen("!", None, 20,21, self.graphStatement), #19
+                            GraphBogen(self.graphExpression[0],None,22,-1, self.graphStatement), #20 ENDBOGEN?
+                            NilBogen(22, self.graphStatement), #21 ENDBOGEN?
                             EndBogen() #22
                           ]
-        self.graphCondition = [  SymbolBogen("ODD",None,1,2), #0
-                            GraphBogen(self.graphExpression[0],None,0,-1), #1
-                            GraphBogen(self.graphExpression[0],None,3,-1), #2
-                            SymbolBogen("=",None,9,4), #3
-                            SymbolBogen("#",None,9,5), #4
-                            SymbolBogen("<",None,9,6), #5
-                            SymbolBogen(">",None,9,7), #6
-                            SymbolBogen("<=",None,9,8), #7
-                            SymbolBogen(">=",None,9,-1), #8
-                            GraphBogen(self.graphExpression[0],None,10,-1), #9
+        self.graphCondition = [  SymbolBogen("ODD",None,1,2, self.graphCondition), #0
+                            GraphBogen(self.graphExpression[0],None,0,-1, self.graphCondition), #1
+                            GraphBogen(self.graphExpression[0],None,3,-1, self.graphCondition), #2
+                            SymbolBogen("=",None,9,4, self.graphCondition), #3
+                            SymbolBogen("#",None,9,5, self.graphCondition), #4
+                            SymbolBogen("<",None,9,6, self.graphCondition), #5
+                            SymbolBogen(">",None,9,7, self.graphCondition), #6
+                            SymbolBogen("<=",None,9,8, self.graphCondition), #7
+                            SymbolBogen(">=",None,9,-1, self.graphCondition), #8
+                            GraphBogen(self.graphExpression[0],None,10,-1, self.graphCondition), #9
                             EndBogen() #10
         ]
-        self.graphProgramm = [GraphBogen(self.graphBlock[0],None,1,-1), #0
-                         SymbolBogen(".",None,2,-1), #1
+        self.graphProgramm = [GraphBogen(self.graphBlock[0],None,1,-1, self.graphProgramm), #0
+                         SymbolBogen(".",None,2,-1, self.graphProgramm), #1
                          EndBogen() #2
                          ]
         self.reInit()
 
     def reInit(self):
-        print("-----------reInit Called------------------")
-        self.graphFactor = [MorphemBogen(MorphemTyp.Ident, None, self.graphFactor[5], self.graphFactor[1]), #0
-                       MorphemBogen(MorphemTyp.Number, None, self.graphFactor[5], self.graphFactor[2]),  #1
-                       SymbolBogen("(", None, self.graphFactor[3], -1),        #2
-                       GraphBogen(self.graphExpression[0], None, self.graphFactor[4], -1),     #3
-                       SymbolBogen(")", None, self.graphFactor[5], -1),        #4
+        self.graphFactor = [MorphemBogen(MorphemTyp.Ident, None, 5, 1, self.graphFactor), #0
+                       MorphemBogen(MorphemTyp.Number, None, 5, 2, self.graphFactor),  #1
+                       SymbolBogen("(", None, 3, -1, self.graphFactor),        #2
+                       GraphBogen(self.graphExpression[0], None, 4, -1, self.graphFactor),     #3
+                       SymbolBogen(")", None, 5, -1, self.graphFactor),        #4
                        EndBogen() #5
                        ]
 
                     #Typ    String  None Folge Alternative
-        self.graphBlock = [SymbolBogen("CONST",None, self.graphBlock[1], self.graphBlock[6]), #0
-                      MorphemBogen(MorphemTyp.Ident, None, self.graphBlock[2], -1),#1
-                      SymbolBogen("=", None, self.graphBlock[3], -1),    #2
-                      MorphemBogen(MorphemTyp.Number, None, self.graphBlock[4], -1),#3
-                      SymbolBogen(",", None, self.graphBlock[1], self.graphBlock[5]),    #4
-                      SymbolBogen(";", None, self.graphBlock[7], -1),    #5
-                      NilBogen(self.graphBlock[7]),    #6        #ist das kein Prooblem? 0 steht fur ersten bogen UND fuer keinen bogen
-                      SymbolBogen("VAR", None, self.graphBlock[8],self.graphBlock[11]), #7
-                      MorphemBogen("ident",None,self.graphBlock[9],-1),  #8
-                      SymbolBogen(",",None,self.graphBlock[8],self.graphBlock[10]),     #9
-                      SymbolBogen(";", None, self.graphBlock[12], -1),  #10
-                      NilBogen(self.graphBlock[12]),  #11
-                      SymbolBogen("PROCEDURE", None, self.graphBlock[13], self.graphBlock[17]),#12
-                      MorphemBogen("ident", None, self.graphBlock[14],-1),#13
-                      SymbolBogen(";", None,self.graphBlock[15],-1),    #14
-                      GraphBogen(self.graphBlock[0], None, self.graphBlock[16],-1),#15
-                      SymbolBogen(";", None, self.graphBlock[12],-1),   #16
+        self.graphBlock = [SymbolBogen("CONST",None, 1, 6, self.graphBlock), #0
+                      MorphemBogen(MorphemTyp.Ident, None, 2, -1, self.graphBlock),#1
+                      SymbolBogen("=", None, 3, -1, self.graphBlock),    #2
+                      MorphemBogen(MorphemTyp.Number, None, 4, -1, self.graphBlock),#3
+                      SymbolBogen(",", None, 1, 5, self.graphBlock),    #4
+                      SymbolBogen(";", None, 7, -1, self.graphBlock),    #5
+                      NilBogen(7, self.graphBlock), # 6
+                      SymbolBogen("VAR", None, 8, 11, self.graphBlock), #7-----------
+                      MorphemBogen("ident",None,9,-1, self.graphBlock),  #8
+                      SymbolBogen(",",None,8,10, self.graphBlock),     #9
+                      SymbolBogen(";", None, 12, -1, self.graphBlock),  #10
+                      NilBogen(12, self.graphBlock),  #11
+                      SymbolBogen("PROCEDURE", None, 13, 17, self.graphBlock),#12
+                      MorphemBogen("ident", None, 14,-1, self.graphBlock),#13
+                      SymbolBogen(";", None,15,-1, self.graphBlock),    #14
+                      GraphBogen(self.graphBlock[0], None, 16,-1, self.graphBlock),#15
+                      SymbolBogen(";", None, 12,-1, self.graphBlock),   #16
                       #NilBogen(None,18), #17
-                      NilBogen(self.graphBlock[18]),#17
-                      GraphBogen(self.graphStatement[0], None,self.graphBlock[19],-1), #18
+                      NilBogen(18, self.graphBlock),
+                      GraphBogen(self.graphStatement[0], None,19,-1, self.graphBlock), #18
                       EndBogen() #19
                       ]
 
-        self.graphExpression = [SymbolBogen("-", None, self.graphExpression[1],self.graphExpression[7]),#0
-                           GraphBogen(self.graphTerm[0], None,self.graphExpression[2],-1),#1
-                           NilBogen(self.graphExpression[3]),#2
-                           SymbolBogen("+",None,self.graphExpression[4],self.graphExpression[5]),#3
-                           GraphBogen(self.graphTerm[0],None,self.graphExpression[2],-1),#4
-                           SymbolBogen("-",None,self.graphExpression[6],self.graphExpression[8]),#5 #ist das so richtig Endbogen nur als alternative
-                           GraphBogen(self.graphTerm[0],None,self.graphExpression[2],-1),#6
-                           GraphBogen(self.graphTerm[0],None,self.graphExpression[2],-1),#7
+
+        self.graphExpression = [SymbolBogen("-", None, 1,7, self.graphExpression),#0
+                           GraphBogen(self.graphTerm[0], None,2,-1, self.graphExpression),#1
+                           NilBogen(3, self.graphExpression),#2
+                           SymbolBogen("+",None,4,5, self.graphExpression),#3
+                           GraphBogen(self.graphTerm[0],None,2,-1, self.graphExpression),#4
+                           SymbolBogen("-",None,6,8, self.graphExpression),#5 #ist das so richtig Endbogen nur als alternative
+                           GraphBogen(self.graphTerm[0],None,2,-1, self.graphExpression),#6
+                           GraphBogen(self.graphTerm[0],None,2,-1, self.graphExpression),#7
                            EndBogen(),#8
                            ]
-        self.graphTerm = [   GraphBogen(self.graphFactor[0],None,self.graphTerm[1],-1), #0
-                        NilBogen(self.graphTerm[2]), #1
-                        SymbolBogen("*",None,self.graphTerm[3],self.graphTerm[4]), #2
-                        GraphBogen(self.graphFactor[0],None,self.graphTerm[1],-1), #3
-                        SymbolBogen("/",None,self.graphTerm[5],self.graphTerm[6]), #4
-                        GraphBogen(self.graphFactor[0],None,self.graphTerm[1],-1), #5
+        self.graphTerm = [   GraphBogen(self.graphFactor[0],None,1,-1, self.graphTerm), #0
+                        NilBogen(2, self.graphTerm), #1
+                        SymbolBogen("*",None,3,4, self.graphTerm), #2
+                        GraphBogen(self.graphFactor[0],None,1,-1, self.graphTerm), #3
+                        SymbolBogen("/",None,5,6, self.graphTerm), #4
+                        GraphBogen(self.graphFactor[0],None,1,-1, self.graphTerm), #5
                         EndBogen(), #6
                      ]
-        self.graphStatement = [  MorphemBogen("ident",None,self.graphStatement[1],self.graphStatement[3]), #0
-                            SymbolBogen(":=",None,self.graphStatement[2],-1), #1
-                            GraphBogen(self.graphExpression[0],None,self.graphStatement[22],-1), #2 ENDBOGEN?
-                            SymbolBogen("IF",None,self.graphStatement[4],self.graphStatement[7]), #3
-                            GraphBogen(self.graphCondition[0],None,self.graphStatement[5],-1), #4
-                            SymbolBogen("THEN",None,self.graphStatement[6],-1), #5
-                            GraphBogen(self.graphStatement[0],None,self.graphStatement[22],-1), #6 ENDBOGEN?
-                            SymbolBogen("WHILE",None,self.graphStatement[8],self.graphStatement[11]), #7
-                            GraphBogen(self.graphCondition[0],None,self.graphStatement[9],-1), #8
-                            SymbolBogen("DO",None,self.graphStatement[10],-1), #9
-                            GraphBogen(self.graphStatement[0], None, self.graphStatement[22],-1), #10 ENDBOGEN?
-                            SymbolBogen("BEGIN",None,self.graphStatement[12],self.graphStatement[15]), #11
-                            GraphBogen(self.graphStatement[0],None, self.graphStatement[13], -1), #12
-                            SymbolBogen(";",None,self.graphStatement[12],self.graphStatement[14]), #13
-                            SymbolBogen("END",None, self.graphStatement[22],-1), #14 ENDBOGEN?
-                            SymbolBogen("CALL",None,self.graphStatement[16],self.graphStatement[17]), #15
-                            MorphemBogen("ident",None,self.graphStatement[22],-1), #16 ENDBOGEN?
-                            SymbolBogen("?",None, self.graphStatement[18],self.graphStatement[19]), #17
-                            MorphemBogen("ident",None, self.graphStatement[22],-1), #18 ENDBOGEN?
-                            SymbolBogen("!", None, self.graphStatement[20],self.graphStatement[21]), #19
-                            GraphBogen(self.graphExpression[0],None,self.graphStatement[22],-1), #20 ENDBOGEN?
-                            NilBogen(self.graphStatement[22]), #21 ENDBOGEN?
+        self.graphStatement = [  MorphemBogen("ident",None,1,3, self.graphStatement), #0
+                            SymbolBogen(":=",None,2,-1, self.graphStatement), #1
+                            GraphBogen(self.graphExpression[0],None,22,-1, self.graphStatement), #2 ENDBOGEN?
+                            SymbolBogen("IF",None,4,7, self.graphStatement), #3
+                            GraphBogen(self.graphCondition[0],None,5,-1, self.graphStatement), #4
+                            SymbolBogen("THEN",None,6,-1, self.graphStatement), #5
+                            GraphBogen(self.graphStatement[0],None,22,-1, self.graphStatement), #6 ENDBOGEN?
+                            SymbolBogen("WHILE",None,8,11, self.graphStatement), #7
+                            GraphBogen(self.graphCondition[0],None,9,-1, self.graphStatement), #8
+                            SymbolBogen("DO",None,10,-1, self.graphStatement), #9
+                            GraphBogen(self.graphStatement[0], None, 22,-1, self.graphStatement), #10 ENDBOGEN?
+                            SymbolBogen("BEGIN",None,12,15, self.graphStatement), #11
+                            GraphBogen(self.graphStatement[0],None, 13,-1, self.graphStatement), #12
+                            SymbolBogen(";",None,12,14, self.graphStatement), #13
+                            SymbolBogen("END",None, 22,-1, self.graphStatement), #14 ENDBOGEN?
+                            SymbolBogen("CALL",None,16,17, self.graphStatement), #15
+                            MorphemBogen("ident",None,22,-1, self.graphStatement), #16 ENDBOGEN?
+                            SymbolBogen("?",None, 18,19, self.graphStatement), #17
+                            MorphemBogen("ident",None, 22,-1, self.graphStatement), #18 ENDBOGEN?
+                            SymbolBogen("!", None, 20,21, self.graphStatement), #19
+                            GraphBogen(self.graphExpression[0],None,22,-1, self.graphStatement), #20 ENDBOGEN?
+                            NilBogen(22, self.graphStatement), #21 ENDBOGEN?
                             EndBogen() #22
                           ]
-        self.graphCondition = [  SymbolBogen("ODD",None,self.graphCondition[1],self.graphCondition[2]), #0
-                            GraphBogen(self.graphExpression[0],None,self.graphCondition[0],-1), #1
-                            GraphBogen(self.graphExpression[0],None,self.graphCondition[3],-1), #2
-                            SymbolBogen("=",None,self.graphCondition[9],self.graphCondition[4]), #3
-                            SymbolBogen("#",None,self.graphCondition[9],self.graphCondition[5]), #4
-                            SymbolBogen("<",None,self.graphCondition[9],self.graphCondition[6]), #5
-                            SymbolBogen(">",None,self.graphCondition[9],self.graphCondition[7]), #6
-                            SymbolBogen("<=",None,self.graphCondition[9],self.graphCondition[8]), #7
-                            SymbolBogen(">=",None,self.graphCondition[9],-1), #8
-                            GraphBogen(self.graphExpression[0],None,self.graphCondition[10],-1), #9
+        self.graphCondition = [  SymbolBogen("ODD",None,1,2, self.graphCondition), #0
+                            GraphBogen(self.graphExpression[0],None,0,-1, self.graphCondition), #1
+                            GraphBogen(self.graphExpression[0],None,3,-1, self.graphCondition), #2
+                            SymbolBogen("=",None,9,4, self.graphCondition), #3
+                            SymbolBogen("#",None,9,5, self.graphCondition), #4
+                            SymbolBogen("<",None,9,6, self.graphCondition), #5
+                            SymbolBogen(">",None,9,7, self.graphCondition), #6
+                            SymbolBogen("<=",None,9,8, self.graphCondition), #7
+                            SymbolBogen(">=",None,9,-1, self.graphCondition), #8
+                            GraphBogen(self.graphExpression[0],None,10,-1, self.graphCondition), #9
                             EndBogen() #10
         ]
-        self.graphProgramm = [GraphBogen(self.graphBlock[0],None,self.graphProgramm[1],-1), #0
-                         SymbolBogen(".",None,self.graphProgramm[2],-1), #1
+        self.graphProgramm = [GraphBogen(self.graphBlock[0],None,1,-1, self.graphProgramm), #0
+                         SymbolBogen(".",None,2,-1, self.graphProgramm), #1
                          EndBogen() #2
                          ]
+
+
+    """def reInit(self):
+        print("-----------reInit Called------------------")
+        self.graphFactor = [MorphemBogen(MorphemTyp.Ident, None, self.graphFactor[5], self.graphFactor[1], self.graphFactor), #0
+                       MorphemBogen(MorphemTyp.Number, None, self.graphFactor[5], self.graphFactor[2], self.graphFactor),  #1
+                       SymbolBogen("(", None, self.graphFactor[3], -1, self.graphFactor),        #2
+                       GraphBogen(self.graphExpression[0], None, self.graphFactor[4], -1, self.graphFactor),     #3
+                       SymbolBogen(")", None, self.graphFactor[5], -1, self.graphFactor),        #4
+                       EndBogen() #5
+                       ]
+
+                    #Typ    String  None Folge Alternative
+        self.graphBlock = [SymbolBogen("CONST",None, self.graphBlock[1], self.graphBlock[6], self.graphBlock), #0
+                      MorphemBogen(MorphemTyp.Ident, None, self.graphBlock[2], -1, self.graphBlock),#1
+                      SymbolBogen("=", None, self.graphBlock[3], -1, self.graphBlock),    #2
+                      MorphemBogen(MorphemTyp.Number, None, self.graphBlock[4], -1, self.graphBlock),#3
+                      SymbolBogen(",", None, self.graphBlock[1], self.graphBlock[5], self.graphBlock),    #4
+                      SymbolBogen(";", None, self.graphBlock[7], -1, self.graphBlock),    #5
+                      NilBogen(self.graphBlock[7], self.graphBlock),    #6        #ist das kein Prooblem? 0 steht fur ersten bogen UND fuer keinen bogen
+                      SymbolBogen("VAR", None, self.graphBlock[8],self.graphBlock[11], self.graphBlock), #7
+                      MorphemBogen("ident",None,self.graphBlock[9],-1, self.graphBlock),  #8
+                      SymbolBogen(",",None,self.graphBlock[8],self.graphBlock[10], self.graphBlock),     #9
+                      SymbolBogen(";", None, self.graphBlock[12], -1, self.graphBlock),  #10
+                      NilBogen(self.graphBlock[12], self.graphBlock),  #11
+                      SymbolBogen("PROCEDURE", None, self.graphBlock[13], self.graphBlock[17], self.graphBlock),#12
+                      MorphemBogen("ident", None, self.graphBlock[14],-1, self.graphBlock),#13
+                      SymbolBogen(";", None,self.graphBlock[15],-1, self.graphBlock),    #14
+                      GraphBogen(self.graphBlock[0], None, self.graphBlock[16],-1, self.graphBlock),#15
+                      SymbolBogen(";", None, self.graphBlock[12],-1, self.graphBlock),   #16
+                      #NilBogen(None,18), #17
+                      NilBogen(self.graphBlock[18], self.graphBlock),#17
+                      GraphBogen(self.graphStatement[0], None,self.graphBlock[19],-1, self.graphBlock), #18
+                      EndBogen() #19
+                      ]
+
+        self.graphExpression = [SymbolBogen("-", None, self.graphExpression[1],self.graphExpression[7],self.graphExpression),#0
+                           GraphBogen(self.graphTerm[0], None,self.graphExpression[2],-1,self.graphExpression),#1
+                           NilBogen(self.graphExpression[3],self.graphExpression),#2
+                           SymbolBogen("+",None,self.graphExpression[4],self.graphExpression[5],self.graphExpression),#3
+                           GraphBogen(self.graphTerm[0],None,self.graphExpression[2],-1,self.graphExpression),#4
+                           SymbolBogen("-",None,self.graphExpression[6],self.graphExpression[8],self.graphExpression),#5 #ist das so richtig Endbogen nur als alternative
+                           GraphBogen(self.graphTerm[0],None,self.graphExpression[2],-1,self.graphExpression),#6
+                           GraphBogen(self.graphTerm[0],None,self.graphExpression[2],-1,self.graphExpression),#7
+                           EndBogen(),#8
+                           ]
+        self.graphTerm = [   GraphBogen(self.graphFactor[0],None,self.graphTerm[1],-1,self.graphTerm), #0
+                        NilBogen(self.graphTerm[2],self.graphTerm), #1
+                        SymbolBogen("*",None,self.graphTerm[3],self.graphTerm[4],self.graphTerm), #2
+                        GraphBogen(self.graphFactor[0],None,self.graphTerm[1],-1,self.graphTerm), #3
+                        SymbolBogen("/",None,self.graphTerm[5],self.graphTerm[6],self.graphTerm), #4
+                        GraphBogen(self.graphFactor[0],None,self.graphTerm[1],-1,self.graphTerm), #5
+                        EndBogen(), #6
+                     ]
+        self.graphStatement = [  MorphemBogen("ident",None,self.graphStatement[1],self.graphStatement[3],self.graphStatement), #0
+                            SymbolBogen(":=",None,self.graphStatement[2],-1,self.graphStatement), #1
+                            GraphBogen(self.graphExpression[0],None,self.graphStatement[22],-1,self.graphStatement), #2 ENDBOGEN?
+                            SymbolBogen("IF",None,self.graphStatement[4],self.graphStatement[7],self.graphStatement), #3
+                            GraphBogen(self.graphCondition[0],None,self.graphStatement[5],-1,self.graphStatement), #4
+                            SymbolBogen("THEN",None,self.graphStatement[6],-1,self.graphStatement), #5
+                            GraphBogen(self.graphStatement[0],None,self.graphStatement[22],-1,self.graphStatement), #6 ENDBOGEN?
+                            SymbolBogen("WHILE",None,self.graphStatement[8],self.graphStatement[11],self.graphStatement), #7
+                            GraphBogen(self.graphCondition[0],None,self.graphStatement[9],-1,self.graphStatement), #8
+                            SymbolBogen("DO",None,self.graphStatement[10],-1,self.graphStatement), #9
+                            GraphBogen(self.graphStatement[0], None, self.graphStatement[22],-1,self.graphStatement), #10 ENDBOGEN?
+                            SymbolBogen("BEGIN",None,self.graphStatement[12],self.graphStatement[15],self.graphStatement), #11
+                            GraphBogen(self.graphStatement[0],None, self.graphStatement[13], -1,self.graphStatement), #12
+                            SymbolBogen(";",None,self.graphStatement[12],self.graphStatement[14],self.graphStatement), #13
+                            SymbolBogen("END",None, self.graphStatement[22],-1,self.graphStatement), #14 ENDBOGEN?
+                            SymbolBogen("CALL",None,self.graphStatement[16],self.graphStatement[17],self.graphStatement), #15
+                            MorphemBogen("ident",None,self.graphStatement[22],-1,self.graphStatement), #16 ENDBOGEN?
+                            SymbolBogen("?",None, self.graphStatement[18],self.graphStatement[19],self.graphStatement), #17
+                            MorphemBogen("ident",None, self.graphStatement[22],-1,self.graphStatement), #18 ENDBOGEN?
+                            SymbolBogen("!", None, self.graphStatement[20],self.graphStatement[21],self.graphStatement), #19
+                            GraphBogen(self.graphExpression[0],None,self.graphStatement[22],-1,self.graphStatement), #20 ENDBOGEN?
+                            NilBogen(self.graphStatement[22],self.graphStatement), #21 ENDBOGEN?
+                            EndBogen() #22
+                          ]
+        self.graphCondition = [  SymbolBogen("ODD",None,self.graphCondition[1],self.graphCondition[2],self.graphCondition), #0
+                            GraphBogen(self.graphExpression[0],None,self.graphCondition[0],-1,self.graphCondition), #1
+                            GraphBogen(self.graphExpression[0],None,self.graphCondition[3],-1,self.graphCondition), #2
+                            SymbolBogen("=",None,self.graphCondition[9],self.graphCondition[4],self.graphCondition), #3
+                            SymbolBogen("#",None,self.graphCondition[9],self.graphCondition[5],self.graphCondition), #4
+                            SymbolBogen("<",None,self.graphCondition[9],self.graphCondition[6],self.graphCondition), #5
+                            SymbolBogen(">",None,self.graphCondition[9],self.graphCondition[7],self.graphCondition), #6
+                            SymbolBogen("<=",None,self.graphCondition[9],self.graphCondition[8],self.graphCondition), #7
+                            SymbolBogen(">=",None,self.graphCondition[9],-1,self.graphCondition), #8
+                            GraphBogen(self.graphExpression[0],None,self.graphCondition[10],-1,self.graphCondition), #9
+                            EndBogen() #10
+        ]
+        self.graphProgramm = [GraphBogen(self.graphBlock[0],None,self.graphProgramm[1],-1,self.graphProgramm), #0
+                         SymbolBogen(".",None,self.graphProgramm[2],-1,self.graphProgramm), #1
+                         EndBogen() #2
+                         ]"""
     def lexNext(self):
         print("Nachstes token gelext: ")
         while True:
@@ -290,7 +404,7 @@ class Parse():
                       #MC - MorphemTyp
                       #fx - Funktionspointer
                       #iAlt - Alternativbogen
-                      #iNext - Folebogen
+                      #iNext - Folgebogen
                       #BgX - Bogenbeschreibung
         print(type(bogen))
         BogenTypXY = type(bogen)
@@ -309,9 +423,14 @@ class Parse():
                 succ = True
                 #return False
             if pBog.Typ == bogenTyp.BgSymbol: # done
-                print("Symbolbogen")
-                temp = lexer_.token_to_enum[pBog.Bogenbeschreibung].value
+                token_enum_value = lexer_.token_to_enum.get(pBog.Bogenbeschreibung)
+
+                if token_enum_value is not None:
+                    temp = token_enum_value.value
+                else:
+                    temp = ord(pBog.Bogenbeschreibung)
                 succ = (morphem.Value == temp)
+
             if pBog.Typ == bogenTyp.BgMorphem: #1/2 done
                 print("Morphembogen")
                 succ = (morphem.MorphemTyp==pBog.Bogenbeschreibung)
@@ -330,16 +449,28 @@ class Parse():
                 test = type(bogen)
                 succ = pBog.Folgefunktion#aufrufen()
             if(not succ):
+                #self.reInit()
                 if pBog.Alternativbogen != -1:
-                    pBog = pBog.Alternativbogen
+                    leng = len(pBog.GraphPosition)
+                    # print("---------------")
+                    # print(pBog.GraphPosition)
+                    # print("---------------")
+                    # if pBog.GraphPosition == -1:
+                    #     pBog.GraphPosition = self.graphStatement
+                    # print("---------------")
+                    # print(pBog.GraphPosition)
+                    # print("---------------")
+                    pBog = bogen.GraphPosition[bogen.Alternativbogen]                #aufrufen() Alternativ
                 else:
+                    print("Fail")
                     return False
             else:
                 if pBog.Typ == bogenTyp.BgSymbol or pBog.Typ == bogenTyp.BgMorphem:
                     morphem = self.lexNext()
-                    pBog = pBog.Folgebogen
 
-input_string = "VAR x, y; BEGIN x := 2; y := x + 3; END."
+                pBog = bogen.GraphPosition[bogen.Folgebogen]           #aufrufen()
+
+input_string = "VAR x,y; BEGIN x := 2; y := x + 3; END."
 
 lexer = lexer_.Lexer(input_string)
 def main():
